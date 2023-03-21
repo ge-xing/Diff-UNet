@@ -18,7 +18,6 @@ from unet.basic_unet import BasicUNetEncoder
 set_determinism(123)
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 data_dir = "./datasets/brats2020/MICCAI_BraTS2020_TrainingData/"
 
 max_epoch = 300
