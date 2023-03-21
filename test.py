@@ -34,25 +34,6 @@ def compute_uncer(pred_out):
     uncer_out = - pred_out * torch.log(pred_out)
     return uncer_out
 
-def parse_config(config_path):
-
-    def dict2namespace(config):
-        namespace = argparse.Namespace()
-        for key, value in config.items():
-            if isinstance(value, dict):
-                new_value = dict2namespace(value)
-            else:
-                new_value = value
-            setattr(namespace, key, new_value)
-        return namespace
-
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
-    new_config = dict2namespace(config)
-
-    return new_config
-
-
 class DiffUNet(nn.Module):
     def __init__(self) -> None:
         super().__init__()
@@ -82,19 +63,18 @@ class DiffUNet(nn.Module):
             return self.diffusion.q_sample(x, t, noise=noise), t, noise
 
         elif pred_type == "denose":
+            embeddings = self.embed_model(image)
             return self.model(x, t=step, image=image, embedding=embedding)
 
         elif pred_type == "ddim_sample":
             embeddings = self.embed_model(image)
 
-            uncer_step = 6
+            uncer_step = 4
             sample_outputs = []
             for i in range(uncer_step):
                 sample_outputs.append(self.sample_diffusion.ddim_sample_loop(self.model, (1, 3, 96, 96, 96), model_kwargs={"image": image, "embeddings": embeddings}))
 
             sample_return = torch.zeros((1, 3, 96, 96, 96))
-            step = torch.arange(1, 11)
-            step = torch.softmax(torch.log(step), dim=0)
 
             for index in range(10):
 # 
@@ -110,11 +90,6 @@ class DiffUNet(nn.Module):
                     sample_return += w * sample_outputs[i]["all_samples"][index].cpu()
 
             return sample_return
-
-        elif pred_type == "seg":
-            return self.seg_unet(image)[0]
-        elif pred_type == "embedding":
-            return self.seg_unet(image)
 
 class BraTSTrainer(Trainer):
     def __init__(self, env_type, max_epochs, batch_size, device="cpu", val_every=1, num_gpus=1, logdir="./logs/", master_ip='localhost', master_port=17750, training_script="train.py"):
@@ -132,17 +107,6 @@ class BraTSTrainer(Trainer):
         label = label.float()
         return image, label 
 
-    def convert_label(self, output):
-        b, d, w, h = output.shape[0], output.shape[2], output.shape[3], output.shape[4]
-        show_output = np.zeros((b, d, w, h))
-        wt = output[:, 1] == 1
-        tc = output[:, 0] == 1
-        et = output[:, 2] == 1
-        show_output[wt] = 1
-        show_output[tc] = 2
-        show_output[et] = 3
-        return show_output
-
     def validation_step(self, batch):
         image, label = self.get_input(batch)
        
@@ -157,14 +121,13 @@ class BraTSTrainer(Trainer):
         wt = dice(o, t)
         wt_hd = hausdorff_distance_95(o, t)
         wt_recall = recall(o, t)
-        wt_f1 = 1 if wt > thres else 0
+
         # core
         o = output[:, 0]
         t = target[:, 0]
         tc = dice(o, t)
         tc_hd = hausdorff_distance_95(o, t)
         tc_recall = recall(o, t)
-        tc_f1 = 1 if tc > thres else 0
 
         # active
         o = output[:, 2]
@@ -173,10 +136,9 @@ class BraTSTrainer(Trainer):
         et = dice(o, t)
         et_hd = hausdorff_distance_95(o, t)
         et_recall = recall(o, t)
-        et_f1 = 1 if et > thres else 0
 
         print(f"wt is {wt}, tc is {tc}, et is {et}")
-        return [wt, tc, et, wt_hd, tc_hd, et_hd, wt_recall, tc_recall, et_recall, wt_f1, tc_f1, et_f1]
+        return [wt, tc, et, wt_hd, tc_hd, et_hd, wt_recall, tc_recall, et_recall]
 
 if __name__ == "__main__":
 

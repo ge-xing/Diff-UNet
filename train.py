@@ -32,27 +32,6 @@ val_every = 10
 num_gpus = 4
 device = "cuda:0"
 
-
-
-def parse_config(config_path):
-
-    def dict2namespace(config):
-        namespace = argparse.Namespace()
-        for key, value in config.items():
-            if isinstance(value, dict):
-                new_value = dict2namespace(value)
-            else:
-                new_value = value
-            setattr(namespace, key, new_value)
-        return namespace
-
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
-    new_config = dict2namespace(config)
-
-    return new_config
-
-
 class DiffUNet(nn.Module):
     def __init__(self) -> None:
         super().__init__()
@@ -78,7 +57,7 @@ class DiffUNet(nn.Module):
         self.sampler = UniformSampler(1000)
 
 
-    def forward(self, image=None, x=None, pred_type=None, step=None, embedding=None):
+    def forward(self, image=None, x=None, pred_type=None, step=None):
         if pred_type == "q_sample":
             noise = torch.randn_like(x).to(x.device)
             t, weight = self.sampler.sample(x.shape[0], x.device)
