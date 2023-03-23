@@ -61,7 +61,7 @@ class DiffUNet(nn.Module):
             t, weight = self.sampler.sample(x.shape[0], x.device)
             return self.diffusion.q_sample(x, t, noise=noise), t, noise
 
-        elif pred_type == "denose":
+        elif pred_type == "denoise":
             embeddings = self.embed_model(image)
             return self.model(x, t=step, image=image, embedding=embedding)
 

@@ -63,7 +63,7 @@ class DiffUNet(nn.Module):
             t, weight = self.sampler.sample(x.shape[0], x.device)
             return self.diffusion.q_sample(x, t, noise=noise), t, noise
 
-        elif pred_type == "denose":
+        elif pred_type == "denoise":
             embeddings = self.embed_model(image)
             return self.model(x, t=step, image=image, embeddings=embeddings)
 
@@ -99,7 +99,7 @@ class BraTSTrainer(Trainer):
 
         x_start = (x_start) * 2 - 1
         x_t, t, noise = self.model(x=x_start, pred_type="q_sample")
-        pred_xstart = self.model(x=x_t, step=t, image=image, pred_type="denose")
+        pred_xstart = self.model(x=x_t, step=t, image=image, pred_type="denoise")
 
         loss_dice = self.dice_loss(pred_xstart, label)
         loss_bce = self.bce(pred_xstart, label)
