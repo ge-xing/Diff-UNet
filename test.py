@@ -23,9 +23,11 @@ data_dir = "./datasets/brats2020/MICCAI_BraTS2020_TrainingData/"
 max_epoch = 300
 batch_size = 2
 val_every = 10
-num_gpus = 2
 device = "cuda:0"
-thres = 0.7
+
+number_modality = 4
+number_targets = 3 ## WT, TC, ET
+
 
 def compute_uncer(pred_out):
     pred_out = torch.sigmoid(pred_out)
@@ -36,9 +38,11 @@ def compute_uncer(pred_out):
 class DiffUNet(nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        self.embed_model = BasicUNetEncoder(3, 4, 2, [64, 64, 128, 256, 512, 64])
+        self.embed_model = BasicUNetEncoder(3, number_modality, number_targets, [64, 64, 128, 256, 512, 64])
 
-        self.model = BasicUNetDe(3, 7, 3, [64, 64, 128, 256, 512, 64])
+        self.model = BasicUNetDe(3, number_modality + number_targets, number_targets, [64, 64, 128, 256, 512, 64], 
+                                act = ("LeakyReLU", {"negative_slope": 0.1, "inplace": False}))
+        
         betas = get_named_beta_schedule("linear", 1000)
         self.diffusion = SpacedDiffusion(use_timesteps=space_timesteps(1000, [1000]),
                                             betas=betas,
@@ -71,9 +75,9 @@ class DiffUNet(nn.Module):
             uncer_step = 4
             sample_outputs = []
             for i in range(uncer_step):
-                sample_outputs.append(self.sample_diffusion.ddim_sample_loop(self.model, (1, 3, 96, 96, 96), model_kwargs={"image": image, "embeddings": embeddings}))
+                sample_outputs.append(self.sample_diffusion.ddim_sample_loop(self.model, (1, number_targets, 96, 96, 96), model_kwargs={"image": image, "embeddings": embeddings}))
 
-            sample_return = torch.zeros((1, 3, 96, 96, 96))
+            sample_return = torch.zeros((1, number_targets, 96, 96, 96))
 
             for index in range(10):
 # 

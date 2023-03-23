@@ -32,12 +32,15 @@ val_every = 10
 num_gpus = 4
 device = "cuda:0"
 
+number_modality = 4
+number_targets = 3 ## WT, TC, ET
+
 class DiffUNet(nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        self.embed_model = BasicUNetEncoder(3, 4, 2, [64, 64, 128, 256, 512, 64])
+        self.embed_model = BasicUNetEncoder(3, number_modality, number_targets, [64, 64, 128, 256, 512, 64])
 
-        self.model = BasicUNetDe(3, 7, 3, [64, 64, 128, 256, 512, 64], 
+        self.model = BasicUNetDe(3, number_modality + number_targets, number_targets, [64, 64, 128, 256, 512, 64], 
                                 act = ("LeakyReLU", {"negative_slope": 0.1, "inplace": False}))
    
         betas = get_named_beta_schedule("linear", 1000)
@@ -70,7 +73,7 @@ class DiffUNet(nn.Module):
         elif pred_type == "ddim_sample":
             embeddings = self.embed_model(image)
 
-            sample_out = self.sample_diffusion.ddim_sample_loop(self.model, (1, 3, 96, 96, 96), model_kwargs={"image": image, "embeddings": embeddings})
+            sample_out = self.sample_diffusion.ddim_sample_loop(self.model, (1, number_targets, 96, 96, 96), model_kwargs={"image": image, "embeddings": embeddings})
             sample_out = sample_out["pred_xstart"]
             return sample_out
 
