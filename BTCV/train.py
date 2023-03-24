@@ -27,8 +27,12 @@ model_save_path = os.path.join(logdir, "model")
 max_epoch = 3000
 batch_size = 1
 val_every = 100
-env = "pytorch"
-num_gpus = 1
+env = "DDP"
+num_gpus = 4
+# or
+# env = "pytorch"
+# num_gpus = 1
+
 device = "cuda:0"
 
 class DiffUNet(nn.Module):
