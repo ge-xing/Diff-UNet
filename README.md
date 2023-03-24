@@ -10,13 +10,13 @@ Diff-UNet achieves more accuracy in multiple segmentation tasks compared with ot
 ![](/imgs/framework.png)
 
 ## dataset 
-The dataset is BraTS2020. You can find it and see the details in https://www.med.upenn.edu/cbica/brats2020/data.html
+We release the codes which support the training and testing process of two dataset, BraTS2020 and BTCV.
 
-Once the data is downloaded, you can begin the training process. The data dir is:
+BraTS2020(4 modalities and 3 segmentation targets): https://www.med.upenn.edu/cbica/brats2020/data.html
 
-```python
-data_dir = "./datasets/brats2020/MICCAI_BraTS2020_TrainingData/"
-```
+BTCV(1 modalities and 13 segmentation targets): https://www.synapse.org/#!Synapse:syn3193805/wiki/217789
+
+Once the data is downloaded, you can begin the training process.
 
 ## training 
 
