@@ -10,7 +10,7 @@ Diff-UNet achieves more accuracy in multiple segmentation tasks compared with ot
 ![](/imgs/framework.png)
 
 ## dataset 
-We release the codes which support the training and testing process of two dataset, BraTS2020 and BTCV.
+We release the codes which support the training and testing process of two datasets, BraTS2020 and BTCV.
 
 BraTS2020(4 modalities and 3 segmentation targets): https://www.med.upenn.edu/cbica/brats2020/data.html
 
