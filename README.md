@@ -1,7 +1,9 @@
 
 # Diff-UNet
 
-Diff-UNet: A Diffusion Embedded Network for Volumetric Segmentation.
+Diff-UNet: A Diffusion Embedded Network for Volumetric Segmentation. 
+
+https://arxiv.org/pdf/2303.10326.pdf
 
 We design the Diff-UNet applying diffusion model to solve the 3D medical image segmentation problem.
 
