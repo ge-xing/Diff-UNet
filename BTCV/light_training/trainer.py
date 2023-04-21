@@ -376,19 +376,18 @@ class Trainer:
                         print("not support data type")
                         exit(0)
                     
-                    with torch.autograd.set_detect_anomaly(True):
-                        if self.model is not None:
-                            for param in self.model.parameters(): param.grad = None
-                        loss = self.training_step(batch)
+                    if self.model is not None:
+                        for param in self.model.parameters(): param.grad = None
+                    loss = self.training_step(batch)
 
-                        if self.auto_optim:
-                            loss.backward()
-                            self.optimizer.step()
-                            
-                            lr = self.optimizer.state_dict()['param_groups'][0]['lr']
+                    if self.auto_optim:
+                        loss.backward()
+                        self.optimizer.step()
+                        
+                        lr = self.optimizer.state_dict()['param_groups'][0]['lr']
 
-                            t.set_postfix(loss=loss.item(), lr=lr)
-                        t.update(1)
+                        t.set_postfix(loss=loss.item(), lr=lr)
+                    t.update(1)
         else :
             for idx, batch in enumerate(loader):
                 self.global_step += 1
