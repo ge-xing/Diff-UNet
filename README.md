@@ -18,18 +18,4 @@ BraTS2020(4 modalities and 3 segmentation targets): https://www.med.upenn.edu/cb
 
 BTCV(1 modalities and 13 segmentation targets): https://www.synapse.org/#!Synapse:syn3193805/wiki/217789
 
-Once the data is downloaded, you can begin the training process.
-
-## training 
-
-Training use Pytoch DDP mode with four GPUs. You also can modify the parameters to use one GPU to train(refer to the train.py).
-
-```bash
-python train.py
-```
-
-## testing
-When you have trained a model, please modify the model path, then run the code.
-```bash
-python test.py
-```
+Once the data is downloaded, you can begin the training process. Please see the dir of BraTS2020 and BTCV.

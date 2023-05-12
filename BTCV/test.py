@@ -20,6 +20,9 @@ val_every = 10
 num_gpus = 2
 device = "cuda:0"
 
+data_dir = "./RawData/Training/"
+
+
 def compute_uncer(pred_out):
     pred_out = torch.sigmoid(pred_out)
     pred_out[pred_out < 0.01] = 0.01
@@ -148,7 +151,7 @@ class BraTSTrainer(Trainer):
 
 if __name__ == "__main__":
 
-    train_ds, val_ds, test_ds = get_loader_btcv(batch_size=batch_size, fold=0, cache=False)
+    train_ds, val_ds, test_ds = get_loader_btcv(data_dir=data_dir)
     
     trainer = BraTSTrainer(env_type="pytorch",
                                     max_epochs=max_epoch,
