@@ -148,7 +148,8 @@ def get_loader_brats(data_dir, batch_size=1, fold=0, num_workers=8):
 
     all_dirs = os.listdir(data_dir)
     all_paths = [os.path.join(data_dir, d) for d in all_dirs]
-   
+    import random
+    random.shuffle(all_paths)
     size = len(all_paths)
     train_size = int(0.7 * size)
     val_size = int(0.1 * size)
